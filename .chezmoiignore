@@ -1,0 +1,4 @@
+# Logs / runtime cruft that lives next to configs
+.config/aerospace/*.log
+*.bak
+.DS_Store
