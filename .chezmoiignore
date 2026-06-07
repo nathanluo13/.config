@@ -2,3 +2,5 @@
 .config/aerospace/*.log
 *.bak
 .DS_Store
+.config/raycast/extensions
+.config/raycast/ai
