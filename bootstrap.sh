@@ -85,11 +85,16 @@ fi
 # 8. Install packages from the Brewfile (now on disk after apply) ------------
 BREWFILE="$HOME/.config/homebrew/Brewfile"
 if [ -f "$BREWFILE" ]; then
+  # Newer Homebrew refuses casks from third-party taps until the tap is trusted.
+  # Trust every tap the Brewfile declares before bundling.
+  grep -E '^tap "' "$BREWFILE" | sed -E 's/^tap "([^"]+)".*/\1/' | while read -r t; do
+    brew trust "$t" >/dev/null 2>&1 || true
+  done
   log "Installing packages from Brewfile…"
-  # --no-lock: don't write a Brewfile.lock.json next to the tracked file.
-  # vscode/npm lines are best-effort; don't abort the whole run if one fails.
-  brew bundle --file="$BREWFILE" --no-lock || \
-    log "Some Brewfile entries failed (likely vscode/npm extras) — review above."
+  # Best-effort: pkg-installer casks (SF fonts, etc.) need sudo and vscode/npm
+  # extras need their host app — don't abort the whole run if one fails.
+  brew bundle --file="$BREWFILE" || \
+    log "Some Brewfile entries failed (sudo pkg casks / vscode / npm extras) — review above."
 fi
 
 log "Done. Open a new terminal — katana's setup is live on this machine."
