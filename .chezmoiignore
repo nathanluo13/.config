@@ -1,3 +1,7 @@
+# Repo-only files (must not be applied into $HOME)
+README.md
+bootstrap.sh
+
 # Logs / runtime cruft that lives next to configs
 .config/aerospace/*.log
 *.bak

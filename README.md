@@ -2,11 +2,19 @@
 
 Managed with [chezmoi](https://chezmoi.io). Source of truth for katana's config.
 
-## Apply on a new machine
+## Apply on a new machine (bare Mac, e.g. sword)
+
+One command — installs Homebrew, oh-my-zsh, oh-my-tmux, nvm/node, applies the
+dotfiles, then installs everything in the Brewfile:
 
 ```sh
-brew install chezmoi
-chezmoi init --apply <this-repo-url>
+curl -fsSL https://raw.githubusercontent.com/nathanluo13/dot-mac/main/bootstrap.sh | bash
+```
+
+If chezmoi is already present and you only want the config files:
+
+```sh
+chezmoi init --apply nathanluo13/dot-mac
 ```
 
 ## Daily use
@@ -22,8 +30,10 @@ chezmoi cd && git push  # commit + push the source repo
 ## Managed
 
 - Shell: `.zshrc`, `.zprofile`, `.gitconfig`
-- Apps: aerospace (+ fullscreen-watch.sh), kitty, nvim (LazyVim), btop, spotify-player
+- Apps: aerospace (+ fullscreen-watch.sh), kitty, nvim (LazyVim), btop, spotify-player, tmux (`tmux.conf.local`)
+- Packages: `.config/homebrew/Brewfile` (brew + cask + vscode + npm globals)
 - launchd: `com.nathan.aerospace-fullscreen-watch.plist`
+- Bootstrap: `bootstrap.sh` (repo-only — installs prerequisites chezmoi can't track)
 
 ## Deliberately NOT tracked (secrets / app-managed state)
 

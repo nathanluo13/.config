@@ -1,2 +1,6 @@
 [user]
 	email = nathanluo13@gmail.com
+[core]
+	editor = nvim
+[push]
+	default = current

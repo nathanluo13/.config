@@ -113,8 +113,11 @@ on-mode-changed = []
 
     alt-tab = 'workspace-back-and-forth'
     alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
-
+    alt-backslash = 'mode passthrough'
     alt-shift-semicolon = 'mode service'
+
+[mode.passthrough.binding]
+    esc = 'mode main'
 
 [mode.service.binding]
     esc = ['reload-config', 'mode main']
