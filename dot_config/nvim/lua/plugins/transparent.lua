@@ -44,8 +44,12 @@ return {
             "NeoTreeNormal",
             "NeoTreeNormalNC",
           }
+          -- Use :highlight ... guibg=NONE for a PARTIAL update (bg only).
+          -- nvim_set_hl(0, group, { bg = "none" }) REPLACES the whole group,
+          -- wiping fg -> snacks.nvim's blend() then crashes on a nil fg during
+          -- :checkhealth. See basecamp/omarchy#3878.
           for _, group in ipairs(groups) do
-            vim.api.nvim_set_hl(0, group, { bg = "none", ctermbg = "none" })
+            vim.cmd("highlight " .. group .. " guibg=NONE ctermbg=NONE")
           end
         end,
       })
