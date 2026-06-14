@@ -1,0 +1,75 @@
+{
+  "$schema": "https://aka.ms/winget-packages.schema.2.0.json",
+  "CreationDate": "2026-06-15T09:40:01.194-00:00",
+  "Sources": [
+    {
+      "Packages": [
+        { "PackageIdentifier": "Git.Git" },
+        { "PackageIdentifier": "REALiX.HWiNFO" },
+        { "PackageIdentifier": "namazso.PawnIO" },
+        { "PackageIdentifier": "LizardByte.Sunshine" },
+        { "PackageIdentifier": "VideoLAN.VLC" },
+        { "PackageIdentifier": "7zip.7zip" },
+        { "PackageIdentifier": "Neovim.Neovim" },
+        { "PackageIdentifier": "Google.Chrome" },
+        { "PackageIdentifier": "glzr-io.glazewm" },
+        { "PackageIdentifier": "Microsoft.VisualStudioCode" },
+        { "PackageIdentifier": "Microsoft.VisualStudio.2022.BuildTools" },
+        { "PackageIdentifier": "Microsoft.VisualStudio.BuildTools" },
+        { "PackageIdentifier": "Microsoft.Edge" },
+        { "PackageIdentifier": "DEVCOM.JetBrainsMonoNerdFont" },
+        { "PackageIdentifier": "Microsoft.VCRedist.2015+.x86" },
+        { "PackageIdentifier": "Python.Launcher" },
+        { "PackageIdentifier": "Cloudflare.cloudflared" },
+        { "PackageIdentifier": "Tailscale.Tailscale" },
+        { "PackageIdentifier": "Microsoft.WindowsSDK.10.0.26100" },
+        { "PackageIdentifier": "Microsoft.VCRedist.2015+.x64" },
+        { "PackageIdentifier": "Notion.Notion" },
+        { "PackageIdentifier": "BurntSushi.ripgrep.MSVC" },
+        { "PackageIdentifier": "JesseDuffield.lazygit" },
+        { "PackageIdentifier": "LibreHardwareMonitor.LibreHardwareMonitor" },
+        { "PackageIdentifier": "Microsoft.OneDrive" },
+        { "PackageIdentifier": "ajeetdsouza.zoxide" },
+        { "PackageIdentifier": "Obsidian.Obsidian" },
+        { "PackageIdentifier": "ImputNet.Helium" },
+        { "PackageIdentifier": "junegunn.fzf" },
+        { "PackageIdentifier": "sharkdp.fd" },
+        { "PackageIdentifier": "Python.Python.3.14" },
+        { "PackageIdentifier": "Microsoft.PowerToys" },
+        { "PackageIdentifier": "Python.Python.3.12" },
+        { "PackageIdentifier": "Microsoft.Teams" },
+        { "PackageIdentifier": "Microsoft.AppInstaller" },
+        { "PackageIdentifier": "Microsoft.DotNet.Native.Runtime" },
+        { "PackageIdentifier": "Microsoft.PowerShell" },
+        { "PackageIdentifier": "Microsoft.UI.Xaml.2.8" },
+        { "PackageIdentifier": "Microsoft.VCLibs.Desktop.14" },
+        { "PackageIdentifier": "Microsoft.VCLibs.14" },
+        { "PackageIdentifier": "Microsoft.WindowsAppRuntime.1.6" },
+        { "PackageIdentifier": "Microsoft.WindowsAppRuntime.1.7" },
+        { "PackageIdentifier": "Microsoft.WindowsAppRuntime.1.8" },
+        { "PackageIdentifier": "Microsoft.WindowsTerminal" },
+        { "PackageIdentifier": "Microsoft.WSL" },
+        { "PackageIdentifier": "JanDeDobbeleer.OhMyPosh" }
+      ],
+      "SourceDetails": {
+        "Argument": "https://cdn.winget.microsoft.com/cache",
+        "Identifier": "Microsoft.Winget.Source_8wekyb3d8bbwe",
+        "Name": "winget",
+        "Type": "Microsoft.PreIndexed.Package"
+      }
+    },
+    {
+      "Packages": [
+        { "PackageIdentifier": "XPDC2RH70K22MN" },
+        { "PackageIdentifier": "9MVS1J51GMK6" }
+      ],
+      "SourceDetails": {
+        "Argument": "https://storeedgefd.dsx.mp.microsoft.com/v9.0",
+        "Identifier": "StoreEdgeFD",
+        "Name": "msstore",
+        "Type": "Microsoft.Rest"
+      }
+    }
+  ],
+  "WinGetVersion": "1.28.240"
+}

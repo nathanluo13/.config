@@ -1,6 +1,8 @@
 # Repo-only files (must not be applied into $HOME)
 README.md
+WINDOWS.md
 bootstrap.sh
+bootstrap-windows.ps1
 
 # Logs / runtime cruft that lives next to configs
 .config/aerospace/*.log
@@ -8,3 +10,24 @@ bootstrap.sh
 .DS_Store
 .config/raycast/extensions
 .config/raycast/ai
+
+{{ if ne .chezmoi.os "darwin" }}
+# macOS-only config
+.zprofile
+.zshrc
+.config/aerospace/**
+.config/homebrew/**
+.config/kitty/**
+.config/spotify-player/**
+.config/tmux/**
+Library/**
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+# Windows-only config
+Documents/**
+.config/powershell/**
+.config/scoop/**
+.config/winget/**
+run_once_after_10-install-windows-packages.ps1.tmpl
+{{ end }}
