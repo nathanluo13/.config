@@ -1,0 +1,301 @@
+/**
+ * Import the Nerdfonts icon font.
+ * Ref https://www.nerdfonts.com/cheat-sheet for a cheatsheet of available Nerdfonts icons.
+ */
+@import 'https://www.nerdfonts.com/assets/css/webfont.css';
+
+/**
+ * Tokyo Night palette
+ *   bg      #1a1b26   bg-dark  #16161e   bg-highlight #292e42
+ *   fg      #c0caf5   comment  #565f89
+ *   blue    #7aa2f7   cyan     #7dcfff   green #9ece6a   red #f7768e
+ */
+:root {
+  --text-size: 12px;
+  --icon-size: 12px;
+
+  /* Tokyo Night "Day" fallback for light mode. */
+  --text-color-light: rgba(52 59 88 / 95%);
+  --text-color-dark: rgba(192 202 245 / 95%);
+
+  --icon-color-light: #7aa2f7;
+  --icon-color-dark: rgba(122 162 247 / 95%);
+
+  --background-color-light: rgba(213 217 233 / 92%);
+  --background-color-dark: linear-gradient(
+    rgb(26 27 38 / 92%),
+    rgb(22 22 30 / 88%)
+  );
+
+  /* Accents. */
+  --accent-blue: rgb(122 162 247 / 45%);
+  --accent-red: #f7768e;
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    color: var(--text-color-light);
+  }
+
+  i {
+    color: var(--icon-color-light);
+  }
+
+  .app,
+  .workspaces-menu {
+    background: var(--background-color-light);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: var(--text-color-dark);
+  }
+
+  i {
+    color: var(--icon-color-dark);
+  }
+
+  .app,
+  .workspaces-menu {
+    background: var(--background-color-dark);
+  }
+}
+
+i {
+  margin-right: 7px;
+  font-size: var(--icon-size);
+}
+
+body {
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-size);
+  overflow: hidden;
+}
+
+div,
+span,
+p {
+  cursor: default;
+  user-select: none;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/*
+ * The widget window is a thin 40px bar by default and is grown at runtime
+ * (Tauri setSize) only while the workspace dropdown is open. #root fills the
+ * whole window but stays transparent + click-through; only the bar and the
+ * open menu opt back into pointer events, so apps underneath stay interactive.
+ */
+#root {
+  background: transparent;
+  pointer-events: none;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  height: 40px;
+  padding: 4px 1.5vw;
+  pointer-events: auto;
+  /* Subtle Tokyo Night blue underline instead of plain white. */
+  border-bottom: 1px solid rgb(122 162 247 / 20%);
+}
+
+.left,
+.center,
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.center {
+  justify-self: center;
+}
+
+.right {
+  justify-self: end;
+}
+
+.binding-mode,
+.paused-button,
+.memory,
+.cpu,
+.temp,
+.battery {
+  margin-right: 20px;
+}
+
+/* ---- Workspaces dropdown ---- */
+.workspaces-dropdown {
+  position: relative;
+}
+
+.workspaces-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgb(192 202 245 / 6%);
+  color: rgb(192 202 245 / 90%);
+  border: none;
+  border-radius: 2px;
+  padding: 4px 8px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.workspaces-toggle:hover,
+.workspaces-toggle.open {
+  background: var(--accent-blue);
+  color: rgb(255 255 255 / 95%);
+}
+
+.workspaces-toggle .dropdown-caret {
+  margin-right: 0;
+  transition: transform 0.12s ease;
+}
+
+.workspaces-toggle.open .dropdown-caret {
+  transform: rotate(180deg);
+}
+
+.workspaces-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 340px;
+  max-width: 560px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid rgb(122 162 247 / 25%);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+  pointer-events: auto;
+  z-index: 10;
+}
+
+/*
+ * One workspace = one big clickable row (the only button). Clicking anywhere
+ * on the row focuses that workspace. The label badge sits on the left, the
+ * window "tabs" (App - Title) are inline read-only chips beside it.
+ */
+.workspace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 6px;
+  margin-bottom: 4px;
+  border: none;
+  border-radius: 3px;
+  background: rgb(192 202 245 / 6%);
+  color: rgb(192 202 245 / 90%);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.workspace-row:last-child {
+  margin-bottom: 0;
+}
+
+.workspace-row:hover {
+  background: rgb(192 202 245 / 14%);
+}
+
+.workspace-row.displayed {
+  background: rgb(192 202 245 / 12%);
+}
+
+.workspace-row.focused {
+  background: var(--accent-blue);
+  color: rgb(255 255 255 / 95%);
+}
+
+.workspace-label {
+  flex: 0 0 auto;
+  min-width: 24px;
+  text-align: center;
+  background: rgb(0 0 0 / 25%);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+
+.workspace-row.focused .workspace-label {
+  background: rgb(255 255 255 / 22%);
+  color: rgb(255 255 255 / 95%);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+}
+
+.tab {
+  max-width: 260px;
+  padding: 2px 8px;
+  font-size: 10px;
+  line-height: 1.4;
+  border-radius: 10px;
+  background: rgb(192 202 245 / 12%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab.empty {
+  background: transparent;
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.binding-mode,
+.paused-button {
+  background: rgb(192 202 245 / 15%);
+  color: rgb(192 202 245 / 90%);
+  border-radius: 2px;
+  line-height: 1;
+  padding: 4px 8px;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Make the PAUSED state stand out in Tokyo Night red. */
+.paused-button {
+  background: rgb(247 118 142 / 25%);
+  color: var(--accent-red);
+}
+
+.binding-mode {
+  margin-right: 4px;
+}
+
+.cpu .high-usage {
+  color: var(--accent-red);
+}
+
+.temp .high-temp {
+  color: var(--accent-red);
+}
+
+.battery {
+  position: relative;
+}
+
+.battery .charging-icon {
+  position: absolute;
+  font-size: 7px;
+  left: -8px;
+  top: 3px;
+}

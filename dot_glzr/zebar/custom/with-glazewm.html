@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Custom styles. -->
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+    <!-- Allows React to be run buildless via "text/babel" script below. -->
+    <script
+      src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
+      integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, {
+        useState,
+        useEffect,
+        useRef,
+      } from 'https://esm.sh/react@18?dev';
+      import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
+      import * as zebar from 'https://esm.sh/zebar@3.0';
+      import { getCurrentWindow } from 'https://esm.sh/@tauri-apps/api@2.0.2/window';
+      import { LogicalSize } from 'https://esm.sh/@tauri-apps/api@2.0.2/dpi';
+
+      const BAR_HEIGHT = 40;
+      const tauriWindow = getCurrentWindow();
+
+      const providers = zebar.createProviderGroup({
+        glazewm: { type: 'glazewm' },
+        cpu: { type: 'cpu' },
+        date: { type: 'date', formatting: 'EEE d MMM t' },
+        battery: { type: 'battery' },
+        memory: { type: 'memory' },
+      });
+
+      createRoot(document.getElementById('root')).render(<App />);
+
+      function App() {
+        const [output, setOutput] = useState(providers.outputMap);
+        const [workspacesOpen, setWorkspacesOpen] = useState(false);
+        // CPU temperature (°C) read from LibreHardwareMonitor's web server.
+        const [cpuTemp, setCpuTemp] = useState(null);
+        const menuRef = useRef(null);
+        // Logical width of the bar, captured once so resizing only changes height.
+        const widthRef = useRef(null);
+        // Last height we applied, to avoid redundant setSize calls on each tick.
+        const lastHeightRef = useRef(BAR_HEIGHT);
+
+        useEffect(() => {
+          providers.onOutput(() => setOutput(providers.outputMap));
+        }, []);
+
+        // Poll LibreHardwareMonitor's web server for the CPU package temp.
+        // LHM serves a nested sensor tree at http://localhost:8085/data.json
+        // (CORS is open). We walk it for the "Core (Tctl/Tdie)" node, falling
+        // back to any CPU temperature node if that label changes.
+        useEffect(() => {
+          let cancelled = false;
+
+          function findCpuTemp(node, underCpu = false) {
+            const text = node.Text ?? '';
+            const isCpu = underCpu || /Ryzen|Intel|Core\(TM\)|CPU/i.test(text);
+            if (
+              node.Value &&
+              /°C/.test(node.Value) &&
+              /Tctl|Tdie|CPU Package|Core Average/i.test(text)
+            ) {
+              const n = parseFloat(String(node.Value).replace(',', '.'));
+              if (!Number.isNaN(n)) return n;
+            }
+            for (const child of node.Children ?? []) {
+              const hit = findCpuTemp(child, isCpu);
+              if (hit != null) return hit;
+            }
+            return null;
+          }
+
+          async function poll() {
+            try {
+              const res = await fetch(
+                `http://localhost:8085/data.json?t=${Date.now()}`,
+              );
+              const data = await res.json();
+              const temp = findCpuTemp(data);
+              if (!cancelled) setCpuTemp(temp);
+            } catch (err) {
+              if (!cancelled) setCpuTemp(null);
+            }
+          }
+
+          poll();
+          const id = setInterval(poll, 3000);
+          return () => {
+            cancelled = true;
+            clearInterval(id);
+          };
+        }, []);
+
+        // Capture the initial (full-screen) logical width once on mount.
+        useEffect(() => {
+          (async () => {
+            try {
+              const size = await tauriWindow.outerSize();
+              const factor = await tauriWindow.scaleFactor();
+              widthRef.current = size.width / factor;
+            } catch (err) {
+              console.error('Failed to read window size:', err);
+            }
+          })();
+        }, []);
+
+        // Grow the widget window to fit the open dropdown, shrink back when
+        // closed. The window is a thin 40px bar otherwise, so the rest of the
+        // screen stays interactive — no full-width dead click-zone.
+        useEffect(() => {
+          const width = widthRef.current ?? window.screen.width;
+          let height = BAR_HEIGHT;
+          if (workspacesOpen && menuRef.current) {
+            const menuBottom = menuRef.current.getBoundingClientRect().bottom;
+            height = Math.ceil(menuBottom) + 8;
+          }
+          if (height === lastHeightRef.current) return;
+          lastHeightRef.current = height;
+          tauriWindow
+            .setSize(new LogicalSize(width, height))
+            .catch(err => console.error('Resize failed:', err));
+        }, [workspacesOpen, output]);
+
+        // Recursively collect window containers within a workspace/container.
+        function getWindows(container) {
+          if (!container) return [];
+          if (container.type === 'window') return [container];
+          return (container.children ?? []).flatMap(getWindows);
+        }
+
+        // Get icon to show for how much of the battery is charged.
+        function getBatteryIcon(batteryOutput) {
+          if (batteryOutput.chargePercent > 90)
+            return <i className="nf nf-fa-battery_4"></i>;
+          if (batteryOutput.chargePercent > 70)
+            return <i className="nf nf-fa-battery_3"></i>;
+          if (batteryOutput.chargePercent > 40)
+            return <i className="nf nf-fa-battery_2"></i>;
+          if (batteryOutput.chargePercent > 20)
+            return <i className="nf nf-fa-battery_1"></i>;
+          return <i className="nf nf-fa-battery_0"></i>;
+        }
+
+        return (
+          <div className="app">
+            <div className="left">
+              {output.glazewm && (
+                <div className="workspaces-dropdown">
+                  <button
+                    className={`workspaces-toggle ${workspacesOpen ? 'open' : ''}`}
+                    onClick={() => setWorkspacesOpen(open => !open)}
+                  >
+                    <span className="workspaces-toggle-label">
+                      {(
+                        output.glazewm.currentWorkspaces.find(
+                          w => w.hasFocus,
+                        ) ?? output.glazewm.currentWorkspaces[0]
+                      )?.displayName ??
+                        output.glazewm.currentWorkspaces.find(
+                          w => w.hasFocus,
+                        )?.name ??
+                        'Workspaces'}
+                    </span>
+                    <i className="nf nf-md-chevron_down dropdown-caret"></i>
+                  </button>
+
+                  {workspacesOpen && (
+                    <div className="workspaces-menu" ref={menuRef}>
+                      {output.glazewm.currentWorkspaces.map(workspace => {
+                        const windows = getWindows(workspace);
+                        return (
+                          <button
+                            className={`workspace-row ${workspace.hasFocus && 'focused'} ${workspace.isDisplayed && 'displayed'}`}
+                            key={workspace.name}
+                            onClick={() => {
+                              output.glazewm.runCommand(
+                                `focus --workspace ${workspace.name}`,
+                              );
+                              setWorkspacesOpen(false);
+                            }}
+                          >
+                            <span className="workspace-label">
+                              {workspace.displayName ?? workspace.name}
+                            </span>
+
+                            <span className="tabs">
+                              {windows.length > 0 ? (
+                                windows.map((win, i) => {
+                                  const label = [
+                                    win.processName,
+                                    win.title,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' - ');
+                                  return (
+                                    <span
+                                      className="tab"
+                                      key={`${workspace.name}-${i}`}
+                                      title={label}
+                                    >
+                                      {label || 'window'}
+                                    </span>
+                                  );
+                                })
+                              ) : (
+                                <span className="tab empty">empty</span>
+                              )}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="center">{output.date?.formatted}</div>
+
+            <div className="right">
+              {output.glazewm && (
+                <>
+                  {output.glazewm.isPaused && (
+                    <button
+                      className="paused-button"
+                      onClick={() =>
+                        output.glazewm.runCommand('wm-toggle-pause')
+                      }
+                    >
+                      PAUSED
+                    </button>
+                  )}
+                  {output.glazewm.bindingModes.map(bindingMode => (
+                    <button
+                      className="binding-mode"
+                      key={bindingMode.name}
+                      onClick={() =>
+                        output.glazewm.runCommand(
+                          `wm-disable-binding-mode --name ${bindingMode.name}`,
+                        )
+                      }
+                    >
+                      {bindingMode.displayName ?? bindingMode.name}
+                    </button>
+                  ))}
+                </>
+              )}
+
+              {output.memory && (
+                <div className="memory">
+                  <i className="nf nf-fae-chip"></i>
+                  {Math.round(output.memory.usage)}%
+                </div>
+              )}
+
+              {output.cpu && (
+                <div className="cpu">
+                  <i className="nf nf-oct-cpu"></i>
+
+                  {/* Change the text color if the CPU usage is high. */}
+                  <span
+                    className={output.cpu.usage > 85 ? 'high-usage' : ''}
+                  >
+                    {Math.round(output.cpu.usage)}%
+                  </span>
+                </div>
+              )}
+
+              {cpuTemp != null && (
+                <div className="temp">
+                  <i className="nf nf-md-thermometer"></i>
+                  {/* Red above 80 °C — the range where the fan ramps hard. */}
+                  <span className={cpuTemp > 80 ? 'high-temp' : ''}>
+                    {Math.round(cpuTemp)}°C
+                  </span>
+                </div>
+              )}
+
+              {output.battery && (
+                <div className="battery">
+                  {/* Show icon for whether battery is charging. */}
+                  {output.battery.isCharging && (
+                    <i className="nf nf-md-power_plug charging-icon"></i>
+                  )}
+                  {getBatteryIcon(output.battery)}
+                  {Math.round(output.battery.chargePercent)}%
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+    </script>
+  </body>
+</html>

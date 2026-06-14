@@ -13,6 +13,7 @@
         { "PackageIdentifier": "Neovim.Neovim" },
         { "PackageIdentifier": "Google.Chrome" },
         { "PackageIdentifier": "glzr-io.glazewm" },
+        { "PackageIdentifier": "glzr-io.zebar" },
         { "PackageIdentifier": "Microsoft.VisualStudioCode" },
         { "PackageIdentifier": "Microsoft.VisualStudio.2022.BuildTools" },
         { "PackageIdentifier": "Microsoft.VisualStudio.BuildTools" },

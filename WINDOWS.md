@@ -21,6 +21,9 @@ chezmoi init --apply nathanluo13/.config
 
 - `Documents/PowerShell/Microsoft.PowerShell_profile.ps1`
 - `Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1`
+- `.glzr/glazewm/config.yaml`
+- `.glzr/zebar/settings.json`
+- `.glzr/zebar/custom/`
 - `.config/powershell/profile.ps1`
 - `.config/winget/packages.json`
 - `.config/scoop/config.json`
@@ -30,6 +33,9 @@ The two PowerShell profile entrypoints dot-source the shared profile in
 `.config/powershell/profile.ps1`. That profile sets the Flint tab title,
 initializes oh-my-posh, initializes zoxide when present, and reports cwd to
 Windows Terminal.
+
+GlazeWM/Zebar config lives under `.glzr/`. GlazeWM starts Zebar on WM startup
+and the custom Zebar pack provides the top bar.
 
 ## Package refresh
 
