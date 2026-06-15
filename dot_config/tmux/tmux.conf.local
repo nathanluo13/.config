@@ -38,7 +38,7 @@ tmux_conf_new_session_retain_current_path=false
 #   - true
 #   - false (default)
 #   - disabled (do not modify new-window bindings)
-tmux_conf_new_window_retain_current_path=false
+tmux_conf_new_window_retain_current_path=true
 
 # new window tries to reconnect ssh sessions, possible values are:
 #   - true
@@ -387,7 +387,7 @@ tmux_conf_urlscan_options="--compact --dedupe"
 #set -g history-limit 10000
 
 # start with mouse mode enabled
-#set -g mouse on
+set -g mouse on
 
 # force Vi mode
 #   really you should export VISUAL or EDITOR environment variable, see manual
@@ -409,6 +409,23 @@ bind m run "cut -c3- '#{TMUX_CONF}' | sh -s _toggle_mouse" \; display 'mouse #{?
 
 # move status line to top
 #set -g status-position top
+
+# tmux-dotbar: minimal status bar matched to the kitty Ghostty Default palette
+set -g @tmux-dotbar-bg "#292c33"
+set -g @tmux-dotbar-fg "#666666"
+set -g @tmux-dotbar-fg-current "#eaeaea"
+set -g @tmux-dotbar-fg-session "#c5c8c6"
+set -g @tmux-dotbar-fg-prefix "#88a1bb"
+set -g @tmux-dotbar-right true
+set -g @tmux-dotbar-status-right-text " %H:%M "
+set -g @tmux-dotbar-window-status-format " #I. #W "
+set -g @tmux-dotbar-window-status-separator "  "
+set -g @tmux-dotbar-bold-status false
+set -g @tmux-dotbar-bold-current-window false
+set -g @tmux-dotbar-rounded false
+set -g @tmux-dotbar-ssh-icon-only true
+run ~/.config/tmux/plugins/tmux-dotbar/dotbar.tmux
+set -gw monitor-activity off
 
 
 # -- tpm -----------------------------------------------------------------------

@@ -3,8 +3,9 @@
 # bootstrap.sh — bring a bare macOS machine (e.g. sword) up to katana's setup.
 #
 # This is the ONE command to run on a fresh Mac. It installs the prerequisites
-# that chezmoi does not track (Homebrew, oh-my-zsh, oh-my-tmux, nvm/node), then
-# applies the dotfiles and installs every package from the Brewfile.
+# that chezmoi does not track (Homebrew, oh-my-zsh, oh-my-tmux, tmux-dotbar,
+# nvm/node), then applies the dotfiles and installs every package from the
+# Brewfile.
 #
 # Usage on a bare machine:
 #   curl -fsSL https://raw.githubusercontent.com/nathanluo13/dot-mac/main/bootstrap.sh | bash
@@ -48,14 +49,19 @@ if [ ! -d "$HOME/.oh-my-zsh" ]; then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
-# 5. oh-my-tmux + symlink ----------------------------------------------------
+# 5. tmux: oh-my-tmux + plugins + symlink ------------------------------------
 OMT_DIR="$HOME/.local/share/tmux/oh-my-tmux"
 if [ ! -d "$OMT_DIR" ]; then
   log "Cloning oh-my-tmux…"
   mkdir -p "$(dirname "$OMT_DIR")"
   git clone --depth 1 https://github.com/gpakosz/.tmux.git "$OMT_DIR"
 fi
-mkdir -p "$HOME/.config/tmux"
+mkdir -p "$HOME/.config/tmux/plugins"
+TMUX_DOTBAR_DIR="$HOME/.config/tmux/plugins/tmux-dotbar"
+if [ ! -d "$TMUX_DOTBAR_DIR" ]; then
+  log "Cloning tmux-dotbar…"
+  git clone --depth 1 https://github.com/vaaleyard/tmux-dotbar.git "$TMUX_DOTBAR_DIR"
+fi
 ln -sf "$OMT_DIR/.tmux.conf" "$HOME/.config/tmux/tmux.conf"
 # (tmux.conf.local is applied by chezmoi in step 7.)
 

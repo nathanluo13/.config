@@ -111,6 +111,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+{{ if eq .chezmoi.os "darwin" -}}
 # Restart the Wacom tablet driver. Fixes the "Bluetooth connected but pen does
 # nothing" state (driver loses its input pipe, esp. after a macOS update).
 # IMPORTANT: bounce ONLY the driver — do NOT also restart Wacom_IOManager, or
@@ -121,13 +122,22 @@ wacom-restart() {
     || echo "Failed to restart Wacom driver."
 }
 alias wacomfix='wacom-restart'
+{{ end }}
 
 # Roots that `cdf` fuzzy-searches. Edit this list freely.
 CDF_ROOTS=(
+{{ if eq .chezmoi.os "darwin" -}}
   "$HOME/nuu"
   "$HOME/c"
   "$HOME/device"
   "$HOME/unimelb"
+{{ else if eq .chezmoi.os "linux" -}}
+  "$HOME/c"
+  "$HOME/device"
+  "$HOME/src"
+  "$HOME/work"
+  "/mnt/c/Users/{{ .chezmoi.username }}"
+{{ end -}}
 )
 CDF_DEPTH=3
 
@@ -139,14 +149,25 @@ cdf() {
   cd "$dir"
 }
 
-# pnpm
-export PNPM_HOME="/Users/nathan/Library/pnpm"
+{{ if eq .chezmoi.os "darwin" -}}
+export PNPM_HOME="$HOME/Library/pnpm"
+export PNPM_PATH_ENTRY="$PNPM_HOME/bin"
+{{ else if eq .chezmoi.os "linux" -}}
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PNPM_PATH_ENTRY="$PNPM_HOME"
+{{ end -}}
+{{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
 case ":$PATH:" in
-  *":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+  *":$PNPM_PATH_ENTRY:"*) ;;
+  *) export PATH="$PNPM_PATH_ENTRY:$PATH" ;;
 esac
+unset PNPM_PATH_ENTRY
 # pnpm end
-export PATH="$HOME/.nuucognition/ndv/bin:$PATH"
+{{ end -}}
+
+if [[ -d "$HOME/.nuucognition/ndv/bin" ]]; then
+  export PATH="$HOME/.nuucognition/ndv/bin:$PATH"
+fi
 
 # >>> orbh shell-integration >>>
 # Managed by `flint setup shell-integration`. Keeps non-Orbh terminal tabs
@@ -160,8 +181,10 @@ _orbh_static_title() {
 add-zsh-hook precmd _orbh_static_title
 # <<< orbh shell-integration <<<
 
-# Added by Devin
-export PATH="/Users/nathan/.codeium/windsurf/bin:$PATH"
+# Added by Devin / Windsurf when present
+if [[ -d "$HOME/.codeium/windsurf/bin" ]]; then
+  export PATH="$HOME/.codeium/windsurf/bin:$PATH"
+fi
 
 # shellcheck shell=bash
 

@@ -2,10 +2,10 @@
 
 Managed with [chezmoi](https://chezmoi.io). Source of truth for katana's config.
 
-## Apply on a new machine (bare Mac, e.g. sword)
+## Apply on macOS (bare Mac, e.g. sword)
 
-One command — installs Homebrew, oh-my-zsh, oh-my-tmux, nvm/node, applies the
-dotfiles, then installs everything in the Brewfile:
+One command — installs Homebrew, oh-my-zsh, oh-my-tmux, tmux-dotbar, nvm/node,
+applies the dotfiles, then installs everything in the Brewfile:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/nathanluo13/dot-mac/main/bootstrap.sh | bash
@@ -34,6 +34,11 @@ chezmoi cd && git push  # commit + push the source repo
 - Packages: `.config/homebrew/Brewfile` (brew + cask + vscode + npm globals)
 - launchd: `com.nathan.aerospace-fullscreen-watch.plist`
 - Bootstrap: `bootstrap.sh` (repo-only — installs prerequisites chezmoi can't track)
+
+## Windows and WSL
+
+- Windows host setup: see `WINDOWS.md` and `bootstrap-windows.ps1`.
+- Ubuntu WSL setup: see `WSL.md` and `bootstrap-wsl.sh`.
 
 ## Deliberately NOT tracked (secrets / app-managed state)
 
