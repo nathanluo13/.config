@@ -24,7 +24,16 @@ if ((Get-Command winget -ErrorAction SilentlyContinue) -and (Test-Path -LiteralP
 
 if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-    Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+    $scoopInstaller = Join-Path $env:TEMP "install-scoop.ps1"
+    Invoke-WebRequest -UseBasicParsing -Uri https://get.scoop.sh -OutFile $scoopInstaller
+
+    $principal = [Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
+    $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($isAdmin) {
+        & $scoopInstaller -RunAsAdmin
+    } else {
+        & $scoopInstaller
+    }
 }
 
 if (Get-Command scoop -ErrorAction SilentlyContinue) {
