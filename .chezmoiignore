@@ -21,6 +21,13 @@ bootstrap-wsl.sh
 .zshrc
 {{ end }}
 
+{{ if ne .chezmoi.os "linux" }}
+# Linux/WSL-only shell and package config
+.bashrc
+.profile
+.config/wsl/**
+{{ end }}
+
 {{ if ne .chezmoi.os "darwin" }}
 # macOS-only config
 .config/aerospace/**

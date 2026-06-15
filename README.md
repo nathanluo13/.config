@@ -31,7 +31,8 @@ chezmoi cd && git push  # commit + push the source repo
 
 - Shell: `.zshrc`, `.zprofile`, `.gitconfig`
 - Apps: aerospace (+ fullscreen-watch.sh), kitty, nvim (LazyVim), btop, spotify-player, tmux (`tmux.conf.local`)
-- Packages: `.config/homebrew/Brewfile` (brew + cask + vscode + npm globals)
+- Packages: `.config/homebrew/Brewfile` for macOS; `.config/wsl/apt-packages.txt`
+  and `.config/wsl/npm-globals.txt` for Ubuntu WSL
 - launchd: `com.nathan.aerospace-fullscreen-watch.plist`
 - Bootstrap: `bootstrap.sh` (repo-only — installs prerequisites chezmoi can't track)
 

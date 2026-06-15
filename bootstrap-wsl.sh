@@ -16,6 +16,58 @@ NODE_VERSION="${NODE_VERSION:-22}"
 
 log() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33mwarning:\033[0m %s\n' "$*" >&2; }
+clean_package_file() { sed 's/#.*//;/^[[:space:]]*$/d' "$1"; }
+
+find_wsl_config_file() {
+  local name="$1"
+  local script_dir
+
+  script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd -P || pwd)"
+  for candidate in \
+    "$HOME/.config/wsl/$name" \
+    "$PWD/dot_config/wsl/$name" \
+    "$script_dir/dot_config/wsl/$name"; do
+    if [ -r "$candidate" ]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+default_apt_packages() {
+  cat <<'EOF'
+build-essential
+ca-certificates
+curl
+git
+openssh-client
+openssh-server
+unzip
+fzf
+tmux
+zoxide
+zsh
+btop
+fd-find
+gh
+jq
+lazygit
+ripgrep
+tree
+llama.cpp
+lua5.4
+neovim
+EOF
+}
+
+default_npm_globals() {
+  cat <<'EOF'
+agent-browser
+vercel
+EOF
+}
 
 mkdir -p "$HOME/.local/bin"
 export PATH="$HOME/.local/bin:$PATH"
@@ -38,24 +90,17 @@ fi
 if [ "${SKIP_APT:-0}" = "1" ]; then
   log "Skipping apt package installation because SKIP_APT=1."
 elif command -v apt-get >/dev/null 2>&1; then
-  log "Installing Ubuntu development packages..."
+  APT_PACKAGE_FILE="${APT_PACKAGE_FILE:-$(find_wsl_config_file apt-packages.txt || true)}"
+  if [ -n "$APT_PACKAGE_FILE" ]; then
+    log "Installing Ubuntu development packages from $APT_PACKAGE_FILE..."
+    APT_PACKAGES="$(clean_package_file "$APT_PACKAGE_FILE")"
+  else
+    log "Installing Ubuntu development packages from built-in defaults..."
+    APT_PACKAGES="$(default_apt_packages)"
+  fi
+
   $SUDO apt-get update
-  $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential \
-    ca-certificates \
-    curl \
-    fd-find \
-    fzf \
-    git \
-    jq \
-    neovim \
-    openssh-client \
-    openssh-server \
-    ripgrep \
-    tmux \
-    unzip \
-    zoxide \
-    zsh
+  printf '%s\n' "$APT_PACKAGES" | xargs -r $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y
 else
   warn "apt-get not found; skipping system package installation."
 fi
@@ -106,6 +151,18 @@ nvm alias default "$NODE_VERSION" >/dev/null
 nvm use default >/dev/null
 corepack enable
 corepack prepare pnpm@latest --activate
+
+NPM_GLOBAL_FILE="${NPM_GLOBAL_FILE:-$(find_wsl_config_file npm-globals.txt || true)}"
+if [ -n "$NPM_GLOBAL_FILE" ]; then
+  log "Installing npm globals from $NPM_GLOBAL_FILE..."
+  NPM_GLOBALS="$(clean_package_file "$NPM_GLOBAL_FILE")"
+else
+  log "Installing npm globals from built-in defaults..."
+  NPM_GLOBALS="$(default_npm_globals)"
+fi
+if [ -n "$NPM_GLOBALS" ]; then
+  printf '%s\n' "$NPM_GLOBALS" | xargs -r npm install -g
+fi
 
 if [ ! -d "$(chezmoi source-path 2>/dev/null)" ]; then
   log "Initialising dotfiles from ${DOTFILES_REPO}..."

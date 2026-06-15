@@ -1,0 +1,5 @@
+# WSL equivalents for npm entries in .config/homebrew/Brewfile.
+# corepack and pnpm are managed directly by bootstrap-wsl.sh.
+
+agent-browser
+vercel

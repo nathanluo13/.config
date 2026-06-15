@@ -1,0 +1,10 @@
+{{ if eq .chezmoi.os "linux" -}}
+# Keep interactive bash shells aligned with the shared login environment.
+if [ -r "$HOME/.zprofile" ]; then
+  . "$HOME/.zprofile"
+fi
+
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init bash)"
+fi
+{{ end -}}

@@ -1,0 +1,6 @@
+{{ if eq .chezmoi.os "linux" -}}
+# Keep bash login shells aligned with the shared zsh login environment.
+if [ -r "$HOME/.zprofile" ]; then
+  . "$HOME/.zprofile"
+fi
+{{ end -}}

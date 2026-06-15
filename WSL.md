@@ -13,8 +13,23 @@ curl -fsSL https://raw.githubusercontent.com/nathanluo13/.config/main/bootstrap-
 ```
 
 The bootstrap installs Ubuntu packages for shell/dev work, then installs
-chezmoi, oh-my-zsh, oh-my-tmux, tmux-dotbar, nvm, Node, and pnpm. It applies the
-same chezmoi repo with Linux-safe shell and tmux config.
+chezmoi, oh-my-zsh, oh-my-tmux, tmux-dotbar, nvm, Node, pnpm, and npm globals.
+It applies the same chezmoi repo with Linux-safe shell and tmux config.
+
+The WSL package source is split by installer:
+
+- `~/.config/wsl/apt-packages.txt` maps the CLI/dev parts of the Brewfile to
+  Ubuntu packages.
+- `~/.config/wsl/npm-globals.txt` maps the Brewfile's npm global CLIs.
+- `nvm`, Node, corepack, and pnpm are installed by `bootstrap-wsl.sh` because
+  they need shell/runtime setup, not apt.
+
+See `~/.config/wsl/README.md` for the full Brewfile-to-WSL mapping.
+
+The macOS Brewfile remains the source for Mac apps, casks, taps, and
+macOS-specific utilities. Items like AeroSpace, SF Symbols, `switchaudio-osx`,
+`nowplaying-cli`, and menu bar apps do not have a WSL equivalent and should stay
+on the Windows/macOS host side.
 
 If bootstrapping remotely from katana before this branch is pushed, install the
 system packages as root, then run the user-level bootstrap with `SKIP_APT=1`
@@ -46,13 +61,13 @@ The reliable default path is:
 
 ```sh
 ssh work
-wsl.exe --cd ~ --exec bash -l
+wsl.exe --cd ~ --exec zsh -l
 ```
 
 Or from one command:
 
 ```sh
-ssh -t work 'wsl.exe --cd ~ --exec bash -l'
+ssh -t work 'wsl.exe --cd ~ --exec zsh -l'
 ```
 
 That SSHs into the Windows host over Tailscale, then enters Ubuntu through

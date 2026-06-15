@@ -1,0 +1,31 @@
+# WSL equivalents for the CLI/dev parts of .config/homebrew/Brewfile.
+# One apt package per line. Comments and blank lines are ignored.
+
+# Core build/bootstrap tools
+build-essential
+ca-certificates
+curl
+git
+openssh-client
+openssh-server
+unzip
+
+# Shell/session tools
+fzf
+tmux
+zoxide
+zsh
+
+# CLI utilities
+btop
+fd-find
+gh
+jq
+lazygit
+ripgrep
+tree
+
+# Language/editor/runtime tools
+llama.cpp
+lua5.4
+neovim
