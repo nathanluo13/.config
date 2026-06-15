@@ -39,7 +39,10 @@ if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
 if (Get-Command scoop -ErrorAction SilentlyContinue) {
     scoop bucket add main | Out-Null
     $btopAppDir = Join-Path $HOME "scoop\apps\btop"
-    if (-not (Test-Path -LiteralPath $btopAppDir)) {
+    if (-not (Get-Command btop -ErrorAction SilentlyContinue)) {
+        if (Test-Path -LiteralPath $btopAppDir) {
+            scoop uninstall btop | Out-Null
+        }
         scoop install btop
     }
 }
