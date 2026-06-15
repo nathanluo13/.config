@@ -3,7 +3,23 @@ $ErrorActionPreference = "Stop"
 
 $wingetPackages = Join-Path $HOME ".config\winget\packages.json"
 if ((Get-Command winget -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath $wingetPackages)) {
-    winget import -i $wingetPackages --accept-package-agreements --accept-source-agreements
+    $skipDuringBootstrap = @(
+        # Updating Tailscale from a remote SSH session can interrupt or hang the
+        # connection. Keep it in the inventory, but handle upgrades manually.
+        "Tailscale.Tailscale"
+    )
+    $import = Get-Content -LiteralPath $wingetPackages -Raw | ConvertFrom-Json
+    foreach ($source in $import.Sources) {
+        $source.Packages = @(
+            $source.Packages | Where-Object {
+                $skipDuringBootstrap -notcontains $_.PackageIdentifier
+            }
+        )
+    }
+
+    $tempImport = Join-Path $env:TEMP "chezmoi-winget-import.json"
+    $import | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $tempImport -Encoding UTF8
+    winget import -i $tempImport --ignore-unavailable --accept-package-agreements --accept-source-agreements --disable-interactivity
 }
 
 if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {

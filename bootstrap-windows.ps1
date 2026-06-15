@@ -12,9 +12,9 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     throw "winget is required. Install App Installer from Microsoft Store first."
 }
 
-winget install --id Git.Git --source winget --accept-package-agreements --accept-source-agreements
-winget install --id twpayne.chezmoi --source winget --accept-package-agreements --accept-source-agreements
-winget install --id Microsoft.PowerShell --source winget --accept-package-agreements --accept-source-agreements
+winget install --id Git.Git --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
+winget install --id twpayne.chezmoi --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
+winget install --id Microsoft.PowerShell --source winget --accept-package-agreements --accept-source-agreements --disable-interactivity
 
 Update-CurrentProcessPath
 
