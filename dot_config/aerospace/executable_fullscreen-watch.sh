@@ -1,8 +1,8 @@
 #!/bin/bash
 # fullscreen-watch.sh
-# Watches AeroSpace for a focused macOS native-fullscreen window and suppresses
-# AeroSpace keybindings while one is active by switching into the (near-empty)
-# 'fullscreen' mode. Returns to 'main' when the fullscreen app is left.
+# Watches AeroSpace for a focused fullscreen-like window and suppresses AeroSpace
+# keybindings while one is active by switching into the (near-empty) 'fullscreen'
+# mode. Returns to 'main' when the fullscreen-like app is left.
 #
 # Why a poller: AeroSpace has no fullscreen event hook. We keep AeroSpace ENABLED
 # (rather than `enable off`) so its CLI keeps answering queries.
@@ -46,7 +46,7 @@ aero() {
 }
 
 while true; do
-  if ! layout="$(aero list-windows --focused --format '%{window-layout}')"; then
+  if ! focused="$(aero list-windows --focused --format '%{app-bundle-id}|%{app-name}|%{window-title}|%{window-layout}|%{workspace}')"; then
     # Call wedged or AeroSpace unavailable. Don't fight it; re-sync next time
     # AeroSpace answers cleanly.
     last=""
@@ -54,7 +54,18 @@ while true; do
     continue
   fi
 
+  IFS='|' read -r bundle app title layout workspace <<EOF
+$focused
+EOF
+
   if [ "$layout" = "macos_native_fullscreen" ]; then
+    desired="fullscreen"
+  elif [ "$bundle" = "com.moonlight-stream.Moonlight" ] &&
+       [ "$layout" = "floating" ] &&
+       [ -n "$title" ]; then
+    # Moonlight's stream window can be borderless/floating rather than macOS
+    # native fullscreen. The launcher window has an empty title, so avoid
+    # suppressing AeroSpace keys there.
     desired="fullscreen"
   else
     desired="main"
@@ -62,7 +73,7 @@ while true; do
 
   if [ "$desired" != "$last" ]; then
     if aero mode "$desired" >/dev/null; then
-      echo "$(date '+%Y-%m-%d %H:%M:%S') ${last:-init} -> $desired (layout=$layout)"
+      echo "$(date '+%Y-%m-%d %H:%M:%S') ${last:-init} -> $desired (app=${app:-?} title=${title:-?} layout=${layout:-?} workspace=${workspace:-?})"
       last="$desired"
     fi
   fi

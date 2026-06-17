@@ -34,6 +34,75 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
 }
 
+function Show-DashHelp {
+    @"
+Dash command surface.
+
+Usage:
+  dsh <command> [args...]
+
+Commands:
+  help                 Show this help
+  update-tools         Update winget and scoop tools
+  winget-export        Refresh ~/.config/winget/packages.json
+  scoop-export         Refresh ~/.config/scoop/apps.json
+  chezmoi <args...>    Run chezmoi
+  git <args...>        Run git
+  flint <args...>      Run flint
+"@
+}
+
+function Invoke-DashUpdateTools {
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        winget upgrade --all --accept-package-agreements --accept-source-agreements --disable-interactivity
+    }
+
+    if (Get-Command scoop -ErrorAction SilentlyContinue) {
+        scoop update
+        scoop update *
+        scoop cleanup *
+    }
+}
+
+function dsh {
+    param(
+        [Parameter(Position = 0)]
+        [string] $Command = "help",
+
+        [Parameter(Position = 1, ValueFromRemainingArguments = $true)]
+        [string[]] $RemainingArgs
+    )
+
+    switch ($Command) {
+        { $_ -in @("help", "-h", "--help") } {
+            Show-DashHelp
+        }
+        "update-tools" {
+            Invoke-DashUpdateTools @RemainingArgs
+        }
+        "winget-export" {
+            winget export -o "$HOME\.config\winget\packages.json" --accept-source-agreements @RemainingArgs
+        }
+        "scoop-export" {
+            scoop export @RemainingArgs | Set-Content -LiteralPath "$HOME\.config\scoop\apps.json" -Encoding UTF8
+        }
+        "chezmoi" {
+            chezmoi @RemainingArgs
+        }
+        "git" {
+            git @RemainingArgs
+        }
+        "flint" {
+            flint @RemainingArgs
+        }
+        default {
+            throw "Unknown dsh command: $Command"
+        }
+    }
+}
+
+Set-Alias dash dsh
+
 # Report cwd to Windows Terminal (OSC 9;9) so Duplicate Tab and new tabs inherit
 # the current directory. zoxide and OMP own the prompt, so wrap it instead of
 # replacing it.

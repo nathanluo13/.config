@@ -31,8 +31,20 @@ chezmoi init --apply nathanluo13/.config
 
 The two PowerShell profile entrypoints dot-source the shared profile in
 `.config/powershell/profile.ps1`. That profile sets the Flint tab title,
-initializes oh-my-posh, initializes zoxide when present, and reports cwd to
-Windows Terminal.
+initializes oh-my-posh, initializes zoxide when present, defines the `dsh`
+Dash command surface, and reports cwd to Windows Terminal.
+
+## Dash
+
+Windows uses a PowerShell-native `dsh` function instead of the POSIX helper
+scripts used on macOS.
+
+```powershell
+dsh help
+dsh update-tools
+dsh winget-export
+dsh scoop-export
+```
 
 GlazeWM/Zebar config lives under `.glzr/`. GlazeWM starts Zebar on WM startup
 and the custom Zebar pack provides the top bar.

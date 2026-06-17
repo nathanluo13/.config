@@ -51,3 +51,8 @@ Documents/**
 .config/winget/**
 run_once_after_10-install-windows-packages.ps1.tmpl
 {{ end }}
+
+{{ if eq .chezmoi.os "windows" }}
+# POSIX helper commands are implemented as PowerShell functions on Windows.
+.local/**
+{{ end }}

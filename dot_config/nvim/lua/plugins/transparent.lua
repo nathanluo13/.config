@@ -12,15 +12,6 @@ return {
     },
   },
 
-  -- Enable transparency on catppuccin (also installed).
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    opts = {
-      transparent_background = true,
-    },
-  },
-
   -- Fallback: clear common backgrounds for whatever colorscheme is active.
   -- This runs after the colorscheme loads, so it covers cases the
   -- per-theme options above miss.
@@ -35,8 +26,6 @@ return {
             "NormalNC",
             "NormalFloat",
             "FloatBorder",
-            "SignColumn",
-            "LineNr",
             "EndOfBuffer",
             "MsgArea",
             "TelescopeNormal",

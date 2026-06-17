@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Dash command surface.
+
+Usage:
+  dsh <command> [args...]
+
+Commands:
+  help                 Show this help
+  update-tools         Update package-manager and manually cloned tools
+  brewfile-dump        Refresh the chezmoi-tracked Homebrew Brewfile
+  git <command>        Git shorthands: status, short, add, add-all, commit,
+                       commit-message, checkout, branch, diff, staged, log,
+                       push, force-push, pull
+  chezmoi <command>    Chezmoi shorthands: status, diff, apply, edit, re-add,
+                       update, cd, git
+  flint <command>      Flint shorthands: shards, who, orbh
+  node <command>       Node shorthands: npm-install, npm-run, npm-dev,
+                       pnpm-install, pnpm-run, pnpm-dev, dlx
+EOF
+}
+
+cmd=${1:-help}
+if [ "$#" -gt 0 ]; then
+  shift
+fi
+
+case "$cmd" in
+  help|-h|--help)
+    usage
+    ;;
+
+  update-tools)
+    exec "$HOME/.local/bin/update-tools" "$@"
+    ;;
+
+  brewfile-dump)
+    exec brew bundle dump --force --file="$(chezmoi source-path)/dot_config/homebrew/Brewfile" "$@"
+    ;;
+
+  git|g)
+    sub=${1:-status}
+    if [ "$#" -gt 0 ]; then shift; fi
+    case "$sub" in
+      status) exec git status "$@" ;;
+      short) exec git status --short "$@" ;;
+      add) exec git add "$@" ;;
+      add-all) exec git add -A "$@" ;;
+      commit) exec git commit "$@" ;;
+      commit-message) exec git commit -m "$@" ;;
+      checkout) exec git checkout "$@" ;;
+      branch) exec git branch "$@" ;;
+      diff) exec git diff "$@" ;;
+      staged) exec git diff --staged "$@" ;;
+      log) exec git log --oneline --decorate --graph -20 "$@" ;;
+      push) exec git push "$@" ;;
+      force-push) exec git push --force-with-lease "$@" ;;
+      pull) exec git pull --ff-only "$@" ;;
+      *) exec git "$sub" "$@" ;;
+    esac
+    ;;
+
+  chezmoi|cm)
+    sub=${1:-status}
+    if [ "$#" -gt 0 ]; then shift; fi
+    case "$sub" in
+      status) exec chezmoi status "$@" ;;
+      diff) exec chezmoi diff "$@" ;;
+      apply) exec chezmoi apply "$@" ;;
+      edit) exec chezmoi edit "$@" ;;
+      re-add|readd) exec chezmoi re-add "$@" ;;
+      update) exec chezmoi update "$@" ;;
+      cd) exec chezmoi cd "$@" ;;
+      git) exec chezmoi git "$@" ;;
+      *) exec chezmoi "$sub" "$@" ;;
+    esac
+    ;;
+
+  flint|f)
+    sub=${1:-help}
+    if [ "$#" -gt 0 ]; then shift; fi
+    case "$sub" in
+      shards) exec flint shard list "$@" ;;
+      who) exec flint whoami "$@" ;;
+      orbh) exec flint orbh session status "$@" ;;
+      *) exec flint "$sub" "$@" ;;
+    esac
+    ;;
+
+  node)
+    sub=${1:-help}
+    if [ "$#" -gt 0 ]; then shift; fi
+    case "$sub" in
+      npm-install) exec npm install "$@" ;;
+      npm-run) exec npm run "$@" ;;
+      npm-dev) exec npm run dev "$@" ;;
+      pnpm-install) exec pnpm install "$@" ;;
+      pnpm-run) exec pnpm run "$@" ;;
+      pnpm-dev) exec pnpm run dev "$@" ;;
+      dlx) exec pnpm dlx "$@" ;;
+      help|-h|--help) usage ;;
+      *) exec "$sub" "$@" ;;
+    esac
+    ;;
+
+  *)
+    printf 'dsh: unknown command: %s\n\n' "$cmd" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

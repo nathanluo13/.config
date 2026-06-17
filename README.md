@@ -1,6 +1,6 @@
 # dotfiles
 
-Managed with [chezmoi](https://chezmoi.io). Source of truth for katana's config.
+Managed with [chezmoi](https://chezmoi.io). Source of truth for Dash: Nathan's reproducible shell, package, and window-manager setup across macOS and Windows. Linux is future scope via Omarchy; WSL is legacy/deprioritized.
 
 ## Apply on macOS (bare Mac, e.g. sword)
 
@@ -31,10 +31,27 @@ chezmoi cd && git push  # commit + push the source repo
 
 - Shell: `.zshrc`, `.zprofile`, `.gitconfig`
 - Apps: aerospace (+ fullscreen-watch.sh), kitty, nvim (LazyVim), btop, spotify-player, tmux (`tmux.conf.local`)
+- Dash command surface: `dsh` plus shell aliases that point command workflows through it
 - Packages: `.config/homebrew/Brewfile` for macOS; `.config/wsl/apt-packages.txt`
   and `.config/wsl/npm-globals.txt` for Ubuntu WSL
 - launchd: `com.nathan.aerospace-fullscreen-watch.plist`
 - Bootstrap: `bootstrap.sh` (repo-only — installs prerequisites chezmoi can't track)
+
+## Dash
+
+Dash is the command namespace for repeatable setup and day-to-day machine operations:
+
+```sh
+dsh help
+dsh update-tools
+dsh brewfile-dump
+dsh chezmoi status
+dsh git short
+dsh flint shards
+```
+
+On macOS, `dsh` is a tracked executable at `~/.local/bin/dsh`. On Windows, `dsh`
+is defined in the shared PowerShell profile.
 
 ## Windows and WSL
 

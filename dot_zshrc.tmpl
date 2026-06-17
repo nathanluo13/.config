@@ -99,17 +99,96 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# Dash (`dsh`) command surface and small shell shorthands.
+# `dsh` is the canonical namespace for reproducible command aliases.
+
+# Shell/session
+alias reload-shell='source ~/.zshrc'
+alias path='print -l $path'
+alias h='history'
+alias c='clear'
+
+# Navigation and listing
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias home='cd ~'
+alias cdfp='cdf'
+alias l='ls -lah'
+alias ll='ls -lh'
+alias la='ls -lAh'
+{{ if eq .chezmoi.os "darwin" -}}
+alias ls='ls -G'
+{{ else if eq .chezmoi.os "linux" -}}
+alias ls='ls --color=auto'
+{{ end }}
+
+# Dash
+alias dash='dsh'
+
+# Git
+alias g='dsh git'
+alias gs='dsh git short'
+alias gst='dsh git status'
+alias ga='dsh git add'
+alias gaa='dsh git add-all'
+alias gc='dsh git commit'
+alias gcm='dsh git commit-message'
+alias gco='dsh git checkout'
+alias gcb='dsh git checkout -b'
+alias gb='dsh git branch'
+alias gd='dsh git diff'
+alias gds='dsh git staged'
+alias gl='dsh git log'
+alias gp='dsh git push'
+alias gpf='dsh git force-push'
+alias gpl='dsh git pull'
+
+# Chezmoi / dotfiles
+alias cm='dsh chezmoi'
+alias cms='dsh chezmoi status'
+alias cmdiff='dsh chezmoi diff'
+alias cma='dsh chezmoi apply'
+alias cme='dsh chezmoi edit'
+alias cmr='dsh chezmoi re-add'
+alias cmu='dsh chezmoi update'
+alias cmcd='dsh chezmoi cd'
+alias cmg='dsh chezmoi git'
+alias dotfiles='dsh chezmoi cd'
+{{ if eq .chezmoi.os "darwin" -}}
+alias brewfile-dump='dsh brewfile-dump'
+{{ end }}
+
+# Flint
+alias f='dsh flint'
+alias fshards='dsh flint shards'
+alias fwho='dsh flint who'
+alias forbh='dsh flint orbh'
+
+# Tool/package maintenance
+alias update-tools='dsh update-tools'
+{{ if eq .chezmoi.os "darwin" -}}
+alias bi='brew install'
+alias bs='brew search'
+alias bu='brew update && brew upgrade && brew cleanup'
+alias bb='brew bundle'
+{{ end }}
+
+# Node and package managers
+alias ni='dsh node npm-install'
+alias nr='dsh node npm-run'
+alias nrd='dsh node npm-dev'
+alias pi='dsh node pnpm-install'
+alias pr='dsh node pnpm-run'
+alias prd='dsh node pnpm-dev'
+alias px='dsh node dlx'
+
+{{ if eq .chezmoi.os "darwin" -}}
+# macOS
+alias o='open'
+alias show-hidden='defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder'
+alias hide-hidden='defaults write com.apple.finder AppleShowAllFiles -bool false && killall Finder'
+{{ end }}
 
 {{ if eq .chezmoi.os "darwin" -}}
 # Restart the Wacom tablet driver. Fixes the "Bluetooth connected but pen does
