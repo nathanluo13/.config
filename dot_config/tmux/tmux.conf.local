@@ -381,6 +381,9 @@ tmux_conf_urlscan_options="--compact --dedupe"
 
 # -- user customizations -------------------------------------------------------
 
+set -g extended-keys-format csi-u
+set -g extended-keys on
+
 # this is the place to override or undo settings
 
 # increase history size
@@ -417,6 +420,8 @@ set -g @tmux-dotbar-fg-current "#eaeaea"
 set -g @tmux-dotbar-fg-session "#c5c8c6"
 set -g @tmux-dotbar-fg-prefix "#88a1bb"
 set -g @tmux-dotbar-right true
+set -g @tmux-dotbar-justify left
+set -g @tmux-dotbar-session-text "#{p9: [#{=6:session_name}]}"
 set -g @tmux-dotbar-status-right-text " %H:%M "
 set -g @tmux-dotbar-window-status-format " #I. #W "
 set -g @tmux-dotbar-window-status-separator "  "
