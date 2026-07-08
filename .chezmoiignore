@@ -38,8 +38,9 @@ Library/**
 {{ end }}
 
 {{ if not (and (eq .chezmoi.os "linux") (stat (joinPath .chezmoi.homeDir ".local/share/omarchy"))) }}
-# Omarchy-only desktop overrides (Hyprland). Applied only on an Omarchy box.
+# Omarchy-only desktop overrides (Hyprland + waybar). Applied only on an Omarchy box.
 .config/hypr/**
+.config/waybar/**
 {{ end }}
 
 {{ if and (ne .chezmoi.os "darwin") (ne .chezmoi.os "linux") }}
