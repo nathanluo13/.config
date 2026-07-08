@@ -1,0 +1,34 @@
+{{ if and (eq .chezmoi.os "linux") (stat (joinPath .chezmoi.homeDir ".local/share/omarchy")) -}}
+#!/usr/bin/env bash
+# keyd modifier remap — Mac-style modifier layout. Managed by chezmoi (Omarchy only).
+# Installs keyd (if missing) and its config to /etc/keyd/default.conf, then reloads.
+# Re-runs automatically whenever the embedded config below changes.
+#
+# Mapping:
+#   Alt_L  -> Super   |  Super_L -> Alt      (left swap)
+#   Alt_R  -> Super   |  Ctrl_R  -> Alt      (right, Mac-like)
+set -euo pipefail
+
+if ! command -v keyd >/dev/null 2>&1; then
+  echo "Installing keyd..."
+  sudo pacman -S --noconfirm keyd
+fi
+
+sudo install -Dm644 /dev/stdin /etc/keyd/default.conf <<'KEYD'
+[ids]
+*
+
+[main]
+# Left side: swap Super_L and Alt_L
+leftmeta = leftalt
+leftalt = leftmeta
+
+# Right side (Mac-like): Alt_R -> Super, Ctrl_R -> Alt
+rightalt = leftmeta
+rightctrl = rightalt
+KEYD
+
+sudo systemctl enable --now keyd
+sudo keyd reload
+echo "keyd remap applied."
+{{ end -}}
