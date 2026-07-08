@@ -23,9 +23,10 @@ sudo install -Dm644 /dev/stdin /etc/keyd/default.conf <<'KEYD'
 leftmeta = layer(alt)
 leftalt = layer(meta)
 
-# Right side (Mac-like): Alt_R -> Super, Ctrl_R -> Alt
+# Right side (Mac-like): Alt_R -> Super, Ctrl_R -> Alt, PrtSc (between them) -> Alt
 rightalt = layer(meta)
 rightcontrol = layer(alt)
+sysrq = layer(alt)
 KEYD
 
 sudo systemctl enable keyd
