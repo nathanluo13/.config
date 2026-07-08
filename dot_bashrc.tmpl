@@ -1,4 +1,13 @@
 {{ if eq .chezmoi.os "linux" -}}
+# If not running interactively, don't do anything.
+[[ $- != *i* ]] && return
+
+# Layer on top of Omarchy's defaults when present (aliases, functions, prompt).
+# Sourced first so anything below can override it.
+if [ -r "$HOME/.local/share/omarchy/default/bash/rc" ]; then
+  source "$HOME/.local/share/omarchy/default/bash/rc"
+fi
+
 # Keep interactive bash shells aligned with the shared login environment.
 if [ -r "$HOME/.zprofile" ]; then
   . "$HOME/.zprofile"
