@@ -37,6 +37,11 @@ bootstrap-wsl.sh
 Library/**
 {{ end }}
 
+{{ if not (and (eq .chezmoi.os "linux") (stat (joinPath .chezmoi.homeDir ".local/share/omarchy"))) }}
+# Omarchy-only desktop overrides (Hyprland). Applied only on an Omarchy box.
+.config/hypr/**
+{{ end }}
+
 {{ if and (ne .chezmoi.os "darwin") (ne .chezmoi.os "linux") }}
 # tmux config applies on macOS and Linux/WSL only
 .config/tmux/**
